@@ -1,0 +1,29 @@
+---
+
+# check for presence of archive file
+- stat:
+    path: "{ local_download_folder }/{ rancher_cli_name }"
+  register: file_presence
+
+- debug:
+    var: file_presence.stat.exists
+
+- name: Download file if needed
+  get_url:
+    url: "{ rancher_cli_download_url }/{ rancher_cli_name }"
+    dest: "{ local_download_folder }"
+  when: not file_presence.stat.exists
+
+- name: Unarchive zipped tar ball file
+  unarchive:
+    src: "{ local_download_folder }/{ rancher_cli_name }"
+    dest: /usr/local/lib
+    mode: 0755
+  become: yes
+
+- name: Create link into /usr/local/bin
+  file:
+    src: "/usr/local/lib/rancher-{ rancher_version }/rancher"
+    dest: /usr/local/bin/rancher
+    state: link
+  become: yes

@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# initialise rolespec
+. "${ROLESPEC_LIB}/main"
+
+# install specific version of ansible
+#install_ansible "v2.4.0"
+
+
+## place to prepare test, specify needed apps and configurations
+# i.e.: apt-get update \
+#       && apt-get install -y vim git sudo \
+#       && echo "ansible  ALL:(ALL)   NOPASSWD:ALL" > /etc/sudoers.d/ansible \
+#       && useradd -d /home/ansible -m -s /bin/bash ansible
+
+
+# check syntax first, and then that the playbook runs
+assert_playbook_runs
+
+
+## place to verify the result(s) of the test(s)
+# i.e.: assert_path /home/ansible/workspace
+assert_path /usr/local/lib/rancher-v0.6.5
+assert_permission /usr/local/lib/rancher-v0.6.5/rancher 755
+assert_path /usr/local/bin/rancher
+
+
+# check that tha playbook is idempotent
+assert_playbook_idempotent
+
+
+## place to specify tear down actions
+# i.e.: userdel ansible

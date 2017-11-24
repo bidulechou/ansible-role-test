@@ -1,0 +1,14 @@
+FROM williamyeh/ansible:ubuntu16.04
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update \
+    && apt-get install -y apt-utils \
+    && apt-get install -y sudo vim git curl wget net-tools \
+    && mkdir -p /workspace/ansible-playbooks
+
+ADD ./ /workspace/ansible-playbooks/
+ADD docker/ansible.cfg /workspace/ansible-playbooks/ansible.cfg
+
+CMD "ln -s /workspace/ansible-playbooks/roles /workspace/ansible-playbooks/tests/roles/install-rancher-cli/roles"
+CMD ". /workspace/ansible-playbooks/tests/.setenv \
+     && /workspace/ansible-playbooks/tests/roles/install-rancher-cli/test" 

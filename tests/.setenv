@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export ROLESPEC_LIB=/workspace/ansible-playbooks/tests/rolespec/lib
