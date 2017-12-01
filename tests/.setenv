@@ -1,3 +1,6 @@
 #!/bin/bash
 
-export ROLESPEC_LIB=/workspace/ansible-playbooks/tests/rolespec/lib
+if [[ -z "${ROLESPEC_LIB}" ]]; then
+	export ROLESPEC_LIB=${ROLESPEC_HOME}/lib
+fi
+

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [[ -z "$ROLESPEC_HOME" ]]; then
+	export ROLESPEC_HOME=/workspace/rolespec
+fi
+
+if [[ -z "${ROLESPEC_LIB}" ]]; then
+	export ROLESPEC_LIB=${ROLESPEC_HOME}/lib
+fi
+
+if [[ -n "${ROLESPEC_RUNTIME}" ]]; then
+	unset ROLESPEC_RUNTIME
+	export ROLESPEC_RUNTIME=./
+fi
+
+if [[ -z "${ROLESPEC_HOSTS}" ]]; then
+	export ROLESPEC_HOSTS=inventory/hosts
+fi
+
+if [[ -n "${ROLESPEC_PLAYBOOK}" ]]; then
+	unset ROLESPEC_PLAYBOOK
+	export ROLESPEC_PLAYBOOK=playbook.yml
+else
+	export ROLESPEC_PLAYBOOK=playbook.yml
+fi
+
+if [[ -z "${ROLESPEC_ROLES}" ]]; then
+	export ROLESPEC_ROLES=roles
+fi
+
+if [[ -n "${DEBUG}" ]]; then
+	echo "Variables content:"
+	echo -e '\n' "rolespec home: ${ROLESPEC_HOME}"
+	echo "rolespec runtime: ${ROLESPEC_RUNTIME}"
+	echo "rolespec hosts: ${ROLESPEC_HOSTS}"
+	echo "rolespec roles: ${ROLESPEC_ROLES}"
+	echo -e "rolespec playbook: ${ROLESPEC_PLAYBOOK}" '\n'
+fi

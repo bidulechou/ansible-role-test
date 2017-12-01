@@ -1,0 +1,10 @@
+---
+
+local_download_folder: /tmp
+
+rancher_cli_version: v0.6.5
+rancher_cli_suffix: tar.gz
+rancher_cli_platform: linux
+rancher_cli_archi: amd64
+rancher_cli_name: "rancher-{{ rancher_cli_platform }}-{{ rancher_cli_archi }}-{{ rancher_cli_version }}.{{ rancher_cli_suffix }}"
+rancher_cli_download_url: "https://github.com/rancher/cli/releases/download/{{ rancher_cli_version }}"

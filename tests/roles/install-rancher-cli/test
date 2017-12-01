@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ./.setenv
+
 # initialise rolespec
 . "${ROLESPEC_LIB}/main"
 
@@ -15,18 +17,22 @@
 
 
 # check syntax first, and then that the playbook runs
-assert_playbook_runs
-
-
-## place to verify the result(s) of the test(s)
-# i.e.: assert_path /home/ansible/workspace
-assert_path /usr/local/lib/rancher-v0.6.5
-assert_permission /usr/local/lib/rancher-v0.6.5/rancher 755
-assert_path /usr/local/bin/rancher
+if [[ -n "${DEBUG}" ]]; then
+	assert_playbook_runs -vvvv
+else
+	assert_playbook_runs
+fi
 
 
 # check that tha playbook is idempotent
 assert_playbook_idempotent
+
+
+## place to verify the result(s) of the test(s)
+# i.e.: assert_path /home/ansible/workspace
+assert_path /opt/rancher-v0.6.5
+assert_permission /opt/rancher-v0.6.5/rancher 755
+assert_path /usr/local/bin/rancher
 
 
 ## place to specify tear down actions
