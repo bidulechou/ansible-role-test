@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ -n "${SHELL_DEBUG}" ]]; then
-  set -x
+if [[ -n "${TRACE}" ]]; then
+  set +x
 fi
 
 #. /workspace/ansible-playbooks/tests/.setenv
@@ -23,16 +23,9 @@ do
     echo -e "'\n'folder name: ${ROLESPEC_RUNTIME}/tests/roles/${folder}"
   fi
   cd ${ROLESPEC_RUNTIME}/tests/roles/${folder}
-  if [ ! -f "roles" ]; then
-    ln -s ${ROLESPEC_RUNTIME}/roles ./roles
-    ##for debug only...
-    if [[ -n "${DEBUG}" ]]; then
-      ls -l --color=auto
-    fi
-  fi
-  OLD_RUNTIME=${ROLESPEC_RUNETIME}
+  OLD_RUNTIME=${ROLESPEC_RUNTIME}
   ./test
-  unset ROLESPEC_RUNETIME
-  ROLESPEC_RUNETIME=${OLD_RUNTIME}
+  unset ROLESPEC_RUNTIME
+  ROLESPEC_RUNTIME=${OLD_RUNTIME}
   cd -
 done
