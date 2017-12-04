@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -z "$ROLESPEC_HOME" ]]; then
-	export ROLESPEC_HOME=/workspace/rolespec
+	export ROLESPEC_HOME=/workspace/ansible-staging/rolespec
 fi
 
 if [[ -z "${ROLESPEC_LIB}" ]]; then
@@ -9,8 +9,9 @@ if [[ -z "${ROLESPEC_LIB}" ]]; then
 fi
 
 if [[ -n "${ROLESPEC_RUNTIME}" ]]; then
+	export ROLES_HOME=${ROLESPEC_RUNTIME}/roles
 	unset ROLESPEC_RUNTIME
-	export ROLESPEC_RUNTIME=./
+	export ROLESPEC_RUNTIME=${PWD}
 fi
 
 if [[ -z "${ROLESPEC_HOSTS}" ]]; then
