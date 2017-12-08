@@ -12,19 +12,20 @@ Its first goal has been to serve as running example when I tried to build a CI p
 ### First Steps in Ansible Roles Unit Testing ###
 
 ### Prerequisites:
-What you need:
+What you need: \
 * first to clone *rolespec* in your favorite tool's place, it will help you create your first role test (even on Windows).
 * to clone this repository in your own workspace
 * a Linux shell, *Git Bash* is a good candidate but with a little restriction which needs a fix.
-* a Docker Machine (@see: [Docker Toolbox](https://docs.docker.com/toolbox/overview/)).
+* a Docker Machine, for windows platforms, see: [Docker Toolbox Overview](https://docs.docker.com/toolbox/overview/).
 * a customized Ansible docker image which will run tests automatically at runtime.
 
 
 ### Clone Rolespec and Ansible Role Test Git Repositories
-Extract both repositories in the same location, your testing project folder, as show in the example below:
+Extract both repositories in the same location, your testing project folder, as show in the example below: \
 ```Session Shell
-	$ mkdir -p </your/path-to/your-testing-project>
-	$ cd </your/path-to/your-testing-project>
+
+	$ mkdir -p /<your-path-to/your-testing-project>
+	$ cd /<your-path-to/your-testing-project>
 	$ git clone https://github.com/nickjj/rolespec.git
 	Cloning into 'rolespec'...
 	remote: Counting objects: 316, done.
@@ -45,11 +46,22 @@ Extract both repositories in the same location, your testing project folder, as 
 
 
 ### Configure Environment
+Configuring the environment for running rolespec bin script `rolespec*`, you just need to set your path to point to the rolespec's binary sub-folder and some rolespec's environment variable as show bellow: \
+```Shell Session
+
+	$ export ROLESPEC_HOME=/<your-path-to/your-testing-project>/rolespec
+	$ export PATH=${PATH}/${ROLESPEC_HOME}/bin
+	$ export ROLESPEC_LIB=${ROLESPEC_HOME}/lib
+	$
+
+```
+But before running the script for the first time you need to fix the `VERSION` file location and if you want to run it on Windows platform you also need to fix the `hostname` command issue, as described in the next section.
 
 
 ### Fix Rolespec before using it
-If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below:
+If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below: \
 ```Shell Session
+
 	$ ll ${ROLESPEC_HOME}/lib
 	total 32
 	-rwxr-xr-x 1 jmd 197121 1680 nov.  29 23:03 cli*
@@ -72,7 +84,7 @@ If you want to use, as described in the documentation, the *rolespec* script you
 	total 33
 	-rwxr-xr-x 1 jmd 197121 1680 nov.  29 23:03 cli*
 	-rwxr-xr-x 1 jmd 197121 2310 nov.  29 23:22 config*
-	-rw-r--r-- 1 jmd 197121  187 nov.  29 23:03 config-centos
+ 	-rw-r--r-- 1 jmd 197121  187 nov.  29 23:03 config-centos
 	-rw-r--r-- 1 jmd 197121  262 nov.  29 23:03 config-debian
 	drwxr-xr-x 1 jmd 197121    0 nov.  29 23:03 dsl/
 	-rwxr-xr-x 1 jmd 197121  422 nov.  29 23:03 init*
@@ -84,11 +96,10 @@ If you want to use, as described in the documentation, the *rolespec* script you
 	-rw-r--r-- 1 jmd 197121    7 nov.  29 23:03 VERSION
 
 ```
-As you see above I use environment variables that for some are mandatory wee will see that point in the next section. \
 This fix is valid on every platform.
 
 
-For Windows platform and particularly for **MinGW64**, the `gitbash` shell, there is an issue with the command `hostname`. Windows and MinGW implementations of `hostname` command does not support any argument except `help` and `version` for MinGW. For that reason if you want to use *rolespec* command script you need to apply the following modification to the file `${ROLESPEC_LIB}/config`:
+On Windows platform and particularly with **MinGW64**, the `gitbash` shell, there is an issue with the command `hostname`, because Windows and MinGW implementations of `hostname` command does not support any argument except `help` and `version` for *MinGW*. For that reason if you want to use *rolespec* command script you need to apply the following modification to the file `/<your-path-to/your-testing-project>/rolespec/lib/config`: \
 ```bash
 
 	# Information
