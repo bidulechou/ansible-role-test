@@ -64,7 +64,9 @@ But before running the script for the first time you need to fix the `VERSION` f
   
   
 ### Fix Rolespec before using it  
-1. Mandatory Fix
+  
+1. Mandatory Fix  
+
 If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below:  
   
 ```shell
@@ -106,7 +108,8 @@ If you want to use, as described in the documentation, the *rolespec* script you
   
 This fix is valid on every platform.  
   
-2. Optional Fix (Windows platform only)
+2. Optional Fix (Windows platform only)  
+  
 On Windows platform and particularly with **MinGW64**, the `gitbash` shell, there is an issue with the command `hostname`, because Windows and MinGW implementations of `hostname` command does not support any argument except `help` and `version` for *MinGW*. For that reason if you want to use *rolespec* command script you need to apply the following modification to the file `/<your-path-to/your-testing-project>/rolespec/lib/config`:  
   
 ```bash
