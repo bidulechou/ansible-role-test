@@ -11,7 +11,7 @@ Its first goal has been to serve as running example when I tried to build a CI p
 
 ### First Steps in Ansible Roles Unit Testing ###
 
-#### Prerequisites ####
+#### Prerequisites
 What you need:  
   
 * first to clone *rolespec* in your favorite tool's place, it will help you create your first role test (even on Windows)
@@ -21,7 +21,7 @@ What you need:
 * a customized Ansible docker image which will run tests automatically at runtime
   
   
-#### Clone Rolespec and Ansible Role Test Git Repositories ####  
+#### Clone Rolespec and Ansible Role Test Git Repositories  
 Extract both repositories in the same location, your testing project folder, as show in the example below:  
   
 ```shell
@@ -47,7 +47,7 @@ Extract both repositories in the same location, your testing project folder, as 
 ```
   
   
-#### Configure Environment ####  
+#### Configure Environment  
 Configuring the environment for running rolespec bin script `rolespec*`, you just need to set your path to point to the rolespec's binary sub-folder and some rolespec's environment variable as show bellow:  
   
 ```bash
@@ -62,7 +62,7 @@ Configuring the environment for running rolespec bin script `rolespec*`, you jus
 But before running the script for the first time you need to fix the `VERSION` file location and if you want to run it on Windows platform you also need to fix the `hostname` command issue, as described in the next section.  
   
   
-#### Fix Rolespec before using it ####  
+#### Fix Rolespec before using it  
 If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below:  
   
 ```shell
