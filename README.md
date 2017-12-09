@@ -24,7 +24,7 @@ What you need:
 #### Clone Rolespec and Ansible Role Test Git Repositories ####  
 Extract both repositories in the same location, your testing project folder, as show in the example below:  
   
-```Session Shell
+```shell
 
 	$ mkdir -p /<your-path-to/your-testing-project>
 	$ cd /<your-path-to/your-testing-project>
@@ -50,7 +50,7 @@ Extract both repositories in the same location, your testing project folder, as 
 #### Configure Environment ####  
 Configuring the environment for running rolespec bin script `rolespec*`, you just need to set your path to point to the rolespec's binary sub-folder and some rolespec's environment variable as show bellow:  
   
-```Shell Session
+```bash
 
 	$ export ROLESPEC_HOME=/<your-path-to/your-testing-project>/rolespec
 	$ export PATH=${PATH}/${ROLESPEC_HOME}/bin
@@ -65,7 +65,7 @@ But before running the script for the first time you need to fix the `VERSION` f
 #### Fix Rolespec before using it ####  
 If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below:  
   
-```Shell Session
+```shell
 
 	$ ll ${ROLESPEC_HOME}/lib
 	total 32
