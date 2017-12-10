@@ -249,7 +249,7 @@ We will not explain here how we have customized an Ansible docker image, we assu
   
 You can see in the output sample bellow the tests ran in an automated manner against a customized Ansible docker image:  
   
-```shell
+```ansible
 
 	$ docker run -i --name test-ansible b25202b723ed
 	Cloning into 'rolespec'...
@@ -346,7 +346,7 @@ You can see in the output sample bellow the tests ran in an automated manner aga
 	755 ?
 	
 	
-	'\033[1;35m'TEST'\033[0m': [File '/usr/local/bin/rancher' exists | '\033[1;32m'PASS'\033[0m']
+	TEST: [File '/usr/local/bin/rancher' exists | PASS]
 	
 	/workspace/ansible-playbooks/tests
 	
