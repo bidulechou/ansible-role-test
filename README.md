@@ -23,7 +23,8 @@ What you need:
   
   
 ### Clone Rolespec and Ansible Role Test Git Repositories  
-Extract both repositories in the same location, your testing project folder, as show in the example below:  
+Extract both repositories in the same location, your testing project folder.  
+If you wan to begin from scratch, just clone _rolespec git repository_ as show in the sample below:  
   
 ```shell
 
@@ -37,6 +38,12 @@ Extract both repositories in the same location, your testing project folder, as 
 	Resolving deltas: 100% (161/161), done.
 	Checking connectivity... done.
 
+```
+  
+If you do not want to begin from scratch you can also clone the _ansible-role-test_ git repository as shown bellow:  
+  
+```shell
+
 	$ git clone https://bedule-conseil@bitbucket.org/bedule-conseil/docker-ansible-test-roles.git
 	Cloning into 'docker-ansible-test-roles'...
 	remote: Counting objects: 13, done.
@@ -49,12 +56,13 @@ Extract both repositories in the same location, your testing project folder, as 
   
   
 ### Configure Environment  
-Configuring the environment for running rolespec bin script `rolespec*`, you just need to set your path to point to the rolespec's binary sub-folder and some rolespec's environment variable as show bellow:  
   
-```bash
+Configuring the environment for running rolespec bin script `rolespec*`, you just need to set your path to point to the rolespec's binary sub-folder and some rolespec's environment variable as shown in the sample bellow:  
+  
+```shell
 
 	$ export ROLESPEC_HOME=/<your-path-to/your-testing-project>/rolespec
-	$ export PATH=${PATH}/${ROLESPEC_HOME}/bin
+	$ export PATH=${PATH}:${ROLESPEC_HOME}/bin
 	$ export ROLESPEC_LIB=${ROLESPEC_HOME}/lib
 	$
 
@@ -62,10 +70,22 @@ Configuring the environment for running rolespec bin script `rolespec*`, you jus
   
 But before running the script for the first time you need to fix the `VERSION` file location and if you want to run it on Windows platform you also need to fix the `hostname` command issue, as described in the next section.  
   
+For running tests automation it is also usefull to set the _rolespec runtime_ environment variable as you will see later in the documentation. To set this environment variable proceed as shown in the sample bellow:  
+
+```shell
+
+	$ cd /<your-path-to/your-testing-project>/ansible-role-test
+	$ export ROLESPEC_RUNTIME=${PWD}
+	$ echo ${ROLESPEC_RUNTIME}
+	/<your-path-to/your-testing-project>/ansible-role-test
+	$
+
+```
+In addition to this environment variable if you want to run your `test` script without automation when writing your role you also need to set the `ROLESPEC_LIB` variable environment (see previous section). The orther environment variables that we also need during the running stage can be set by `setenv` scripts sourced directly by test scripts as you will see in *Building Test* section.
   
 ### Fix Rolespec before using it  
   
-1. Mandatory Fix  
+* __Mandatory Fix__  
 
 If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below:  
   
@@ -85,9 +105,7 @@ If you want to use, as described in the documentation, the *rolespec* script you
 	-rwxr-xr-x 1 jmd 197121 3730 nov.  29 23:03 setup-env*
 	-rwxr-xr-x 1 jmd 197121  873 nov.  29 23:03 ui*
 
-
 	$ ln -s ${ROLESPEC_HOME}/VERSION ${ROLESPEC_LIB}/VERSION
-
 
 	$ ll ${ROLESPEC_LIB}
 	total 33
@@ -108,7 +126,7 @@ If you want to use, as described in the documentation, the *rolespec* script you
   
 This fix is valid on every platform.  
   
-2. Optional Fix (Windows platform only)  
+* __Optional Fix__ (Windows platform only)  
   
 On Windows platform and particularly with **MinGW64**, the `gitbash` shell, there is an issue with the command `hostname`, because Windows and MinGW implementations of `hostname` command does not support any argument except `help` and `version` for *MinGW*. For that reason if you want to use *rolespec* command script you need to apply the following modification to the file `/<your-path-to/your-testing-project>/rolespec/lib/config`:  
   
@@ -125,6 +143,65 @@ On Windows platform and particularly with **MinGW64**, the `gitbash` shell, ther
 
 ```
 I have'nt tried with `CygWin` because I have not installed it on my Windows workstation and I do not want to install it except if it's absolutly necessary. If anybody could try it under `CygWin` and let us know the result to complete the fix, thank you in advence.  
+  
+  
+### Ansible Repository Structure
+  
+As described in [Ansible Best Pratices] (http://docs.ansible.com/ansible/latest/playbooks_best_practices.html#alternative-directory-layout) _Alternative Directory Layout_ section we use simplefied Ansible folder structure layout:  
+  
+```
+
+ansible-role-test/
+	inentory/
+		hosts
+		group_vars/
+			all/
+				vars.yml ## could be also named 'commons.yml' (place for all group common variables)
+			group-1/
+				...
+			...
+			group-n/
+				...
+		host_vars/
+			host-1/
+				main.yml
+			...
+			host-x/
+				...
+	filter_plugins/
+	library/
+	module_utils/
+	roles/
+		role-1/
+			tasks/
+				main.yml
+		role-2/
+			...
+		...
+		role-x/
+			...
+	playbook-1.yml
+	...
+	playbooks-x.yml
+
+```
+As you could see, actually the planned folder structure layout is not ocmplete, in your extracted _ansible-role-test_ git repository it lakes some folder, i.e. `inventory/host_vars` or `filter_plugins` or `library` or `modules`. For the 3 last ones this is the place for storing home developed custom filter plugins or libraries or modules. You could also use those places to test new module or filter or library's features that will take place in the next release of Ansible in advence to adapt your roles and playbooks.
+  
+In addition to this simplefied folder structure we have added the role's unit test folder structure to complete configuration steps, see bellow:  
+  
+```
+
+ansible-role-test/
+	...
+	tests/
+		roles/
+			role-1/
+			...
+			role-x/
+
+```
+The Ansible role unit test folder structure will be discuss in more details in next sections.
+  
   
   
 ### How do I get set up? ###
