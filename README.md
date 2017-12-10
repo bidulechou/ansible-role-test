@@ -20,6 +20,7 @@ What you need:
 * a Linux shell, *Git Bash* is a good candidate but with a little restriction which needs a fix
 * a Docker Machine, for windows platforms, see: [Docker Toolbox Overview](https://docs.docker.com/toolbox/overview/)
 * a customized Ansible docker image which will run tests automatically at runtime
+* perhaps a Gradle docker image which will help automating customized docker image build and running tests on change (usefull if you do not have Gradle and Java installed on your workstation)
   
   
 ### Clone Rolespec and Ansible Role Test Git Repositories  
@@ -57,11 +58,44 @@ If you do not want to begin from scratch you can also clone the _ansible-role-te
   
 ### Configure Environment  
   
-Configuring the environment for running rolespec bin script `rolespec*`, you just need to set your path to point to the rolespec's binary sub-folder and some rolespec's environment variable as shown in the sample bellow:  
+Because on Windows platform, even if you use _Git Bash_, the `make install` command does not work as expected we must enfoce manuel setup as you see next. The bellow code sample will I hope will convince you that normal setup as described in the [Rolespec Documentation](https://github.com/nickjj/rolespec#write-your-first-test-case) _Write Your First Test Case_ section not work on Windows 7 platform:  
   
 ```shell
 
-	$ export ROLESPEC_HOME=/<your-path-to/your-testing-project>/rolespec
+	$ cd /<my-path-to/my-testing-projects>/rolespec
+	$ make install
+	Installing RoleSpec scripts in /usr/local/bin ...
+	Installing RoleSpec libs in /usr/local/lib/rolespec ...
+	
+	$ cd ../ansible-role-test
+	
+	$ rolespec -i ${PWD}
+	bash: rolespec: command not found
+	
+	$ echo $PATH
+	~/bin:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:[...]:/usr/bin/vendor_perl:/usr/bin/core_perl
+	
+	$ ll /usr/local/bin
+	ls: cannot access '/usr/local/bin': No such file or directory
+	
+	$ ll /usr/
+	total 104
+	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:25 bin/
+	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:25 lib/
+	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:24 libexec/
+	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:25 share/
+	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:25 ssl/
+
+	$ 
+
+```
+As you can see above, there is no `local` sub-folder in `/usr` folder. But as you can also see the `make install` command has not produced errors. I have also tried to create `/usr/local/bin` and `/usr/local/lib` folders and run again `make install` command without more success. 
+  
+Then configuring the environment for running rolespec bin script `rolespec*` on Windows platform needs to be made manually (or by script). You first need to set your path to point to the rolespec's binary sub-folder and some other rolespec's environment variable as shown in the sample bellow:  
+  
+```shell
+
+	$ export ROLESPEC_HOME=/<your-path-to/your-testing-projects>/rolespec
 	$ export PATH=${PATH}:${ROLESPEC_HOME}/bin
 	$ export ROLESPEC_LIB=${ROLESPEC_HOME}/lib
 	$
@@ -74,14 +108,17 @@ For running tests automation it is also usefull to set the _rolespec runtime_ en
 
 ```shell
 
-	$ cd /<your-path-to/your-testing-project>/ansible-role-test
+	$ cd /<your-path-to/your-testing-projects>/ansible-role-test
 	$ export ROLESPEC_RUNTIME=${PWD}
 	$ echo ${ROLESPEC_RUNTIME}
-	/<your-path-to/your-testing-project>/ansible-role-test
+	/<your-path-to/your-testing-projects>/ansible-role-test
 	$
 
 ```
 In addition to this environment variable if you want to run your `test` script without automation when writing your role you also need to set the `ROLESPEC_LIB` variable environment (see previous section). The orther environment variables that we also need during the running stage can be set by `setenv` scripts sourced directly by test scripts as you will see in *Building Test* section.
+  
+> We assume using in the rest of the documentation _rolespec environment variables_ when focusing on location of files.
+  
   
 ### Fix Rolespec before using it  
   
@@ -93,34 +130,34 @@ If you want to use, as described in the documentation, the *rolespec* script you
 
 	$ ll ${ROLESPEC_HOME}/lib
 	total 32
-	-rwxr-xr-x 1 jmd 197121 1680 nov.  29 23:03 cli*
-	-rwxr-xr-x 1 jmd 197121 2310 nov.  29 23:22 config*
-	-rw-r--r-- 1 jmd 197121  187 nov.  29 23:03 config-centos
-	-rw-r--r-- 1 jmd 197121  262 nov.  29 23:03 config-debian
-	drwxr-xr-x 1 jmd 197121    0 nov.  29 23:03 dsl/
-	-rwxr-xr-x 1 jmd 197121  422 nov.  29 23:03 init*
-	-rwxr-xr-x 1 jmd 197121 4194 nov.  29 23:03 lint*
-	-rwxr-xr-x 1 jmd 197121  221 nov.  29 23:03 main*
-	-rwxr-xr-x 1 jmd 197121 1225 nov.  29 23:03 new-test*
-	-rwxr-xr-x 1 jmd 197121 3730 nov.  29 23:03 setup-env*
-	-rwxr-xr-x 1 jmd 197121  873 nov.  29 23:03 ui*
+	-rwxr-xr-x 1 bidule 197121 1680 nov.  29 23:03 cli*
+	-rwxr-xr-x 1 bidule 197121 2310 nov.  29 23:22 config*
+	-rw-r--r-- 1 bidule 197121  187 nov.  29 23:03 config-centos
+	-rw-r--r-- 1 bidule 197121  262 nov.  29 23:03 config-debian
+	drwxr-xr-x 1 bidule 197121    0 nov.  29 23:03 dsl/
+	-rwxr-xr-x 1 bidule 197121  422 nov.  29 23:03 init*
+	-rwxr-xr-x 1 bidule 197121 4194 nov.  29 23:03 lint*
+	-rwxr-xr-x 1 bidule 197121  221 nov.  29 23:03 main*
+	-rwxr-xr-x 1 bidule 197121 1225 nov.  29 23:03 new-test*
+	-rwxr-xr-x 1 bidule 197121 3730 nov.  29 23:03 setup-env*
+	-rwxr-xr-x 1 bidule 197121  873 nov.  29 23:03 ui*
 
 	$ ln -s ${ROLESPEC_HOME}/VERSION ${ROLESPEC_LIB}/VERSION
 
 	$ ll ${ROLESPEC_LIB}
 	total 33
-	-rwxr-xr-x 1 jmd 197121 1680 nov.  29 23:03 cli*
-	-rwxr-xr-x 1 jmd 197121 2310 nov.  29 23:22 config*
- 	-rw-r--r-- 1 jmd 197121  187 nov.  29 23:03 config-centos
-	-rw-r--r-- 1 jmd 197121  262 nov.  29 23:03 config-debian
-	drwxr-xr-x 1 jmd 197121    0 nov.  29 23:03 dsl/
-	-rwxr-xr-x 1 jmd 197121  422 nov.  29 23:03 init*
-	-rwxr-xr-x 1 jmd 197121 4194 nov.  29 23:03 lint*
-	-rwxr-xr-x 1 jmd 197121  221 nov.  29 23:03 main*
-	-rwxr-xr-x 1 jmd 197121 1225 nov.  29 23:03 new-test*
-	-rwxr-xr-x 1 jmd 197121 3730 nov.  29 23:03 setup-env*
-	-rwxr-xr-x 1 jmd 197121  873 nov.  29 23:03 ui*
-	-rw-r--r-- 1 jmd 197121    7 nov.  29 23:03 VERSION
+	-rwxr-xr-x 1 bidule 197121 1680 nov.  29 23:03 cli*
+	-rwxr-xr-x 1 bidule 197121 2310 nov.  29 23:22 config*
+ 	-rw-r--r-- 1 bidule 197121  187 nov.  29 23:03 config-centos
+	-rw-r--r-- 1 bidule 197121  262 nov.  29 23:03 config-debian
+	drwxr-xr-x 1 bidule 197121    0 nov.  29 23:03 dsl/
+	-rwxr-xr-x 1 bidule 197121  422 nov.  29 23:03 init*
+	-rwxr-xr-x 1 bidule 197121 4194 nov.  29 23:03 lint*
+	-rwxr-xr-x 1 bidule 197121  221 nov.  29 23:03 main*
+	-rwxr-xr-x 1 bidule 197121 1225 nov.  29 23:03 new-test*
+	-rwxr-xr-x 1 bidule 197121 3730 nov.  29 23:03 setup-env*
+	-rwxr-xr-x 1 bidule 197121  873 nov.  29 23:03 ui*
+	-rw-r--r-- 1 bidule 197121    7 nov.  29 23:03 VERSION
 
 ```
   
@@ -200,15 +237,131 @@ ansible-role-test/
 			role-x/
 
 ```
-The Ansible role unit test folder structure will be discuss in more details in next sections.
+The Ansible role unit test folder structure will be discuss in more details in next sections. You can also see wiki page: [My First Test Case From Scratch](https://bitbucket.org/beduleconseil/ansible-role-test/wiki/my-first-test-from-scratch) for further information on how developing tests and role code in _TDD_ approach manner.  
+  
+We will focus now on how to execute tests locally in a customized Ansible docker image or remotely if you use a remote docker machine.  
   
   
+### Running Tests  
+  
+We will not explain here how we have customized an Ansible docker image, we assume you have read first the [Docker Ansible Test Roles](https://bitbucket.org/bedule-conseil/docker-ansible-test-roles/src) project `README.md` file if you need to understand more deeply how we have done it.
+  
+  
+You can see in the output sample bellow the tests ran in an automated manner against a customized Ansible docker image:  
+  
+```shell
+
+	$ docker run -i --name test-ansible b25202b723ed
+	Cloning into 'rolespec'...
+	/
+	
+	TEST: [Run playbook syntax check]
+	
+	playbook: playbook.yml
+	
+	TEST: [Run playbook]
+	
+	PLAY [all] *********************************************************************
+	
+	TASK [Gathering Facts] *********************************************************
+	ok: [localhost]
+	
+	TASK [ping] ********************************************************************
+	ok: [localhost]
+	
+	TASK [debug] *******************************************************************
+	ok: [localhost] => {
+		"ping_result": {
+			"changed": false,
+			"failed": false,
+			"ping": "pong"
+		}
+	}
+	
+	PLAY RECAP *********************************************************************
+	localhost                  : ok=3    changed=0    unreachable=0    failed=0
+	
+	
+	TEST: [Re-run playbook]
+	
+	TEST: [In output | PASS]
+	found:
+	changed=0.*unreachable=0.*failed=0
+	
+	in output:
+	localhost                  : ok=3    changed=0    unreachable=0    failed=0
+	
+	/workspace/ansible-playbooks/tests
+	
+	TEST: [Run playbook syntax check]
+	
+	playbook: playbooks/test.yml
+	
+	TEST: [Run playbook]
+	
+	PLAY [localhost] ***************************************************************
+	
+	TASK [Gathering Facts] *********************************************************
+	ok: [localhost]
+	
+	TASK [install-rancher-cli : stat] **********************************************
+	ok: [localhost]
+	
+	TASK [install-rancher-cli : debug] *********************************************
+	ok: [localhost] => {
+		"file_presence.stat.exists": false
+	}
+	
+	TASK [install-rancher-cli : Download file if needed] ***************************
+	changed: [localhost]
+	
+	TASK [install-rancher-cli : Unarchive zipped tar ball file] ********************
+	changed: [localhost]
+	
+	TASK [install-rancher-cli : Create link into /usr/local/bin] *******************
+	changed: [localhost]
+	
+	PLAY RECAP *********************************************************************
+	localhost                  : ok=6    changed=3    unreachable=0    failed=0
+	
+	
+	TEST: [Re-run playbook]
+	
+	TEST: [In output | PASS]
+	found:
+	changed=0.*unreachable=0.*failed=0
+	
+	in output:
+	localhost                  : ok=5    changed=0    unreachable=0    failed=0
+	
+	
+	TEST: [File '/opt/rancher-v0.6.5' exists | PASS]
+	
+	
+	TEST: [In output | PASS]
+	found:
+	755
+	
+	in output:
+	755 ?
+	
+	
+	'\033[1;35m'TEST'\033[0m': [File '/usr/local/bin/rancher' exists | '\033[1;32m'PASS'\033[0m']
+	
+	/workspace/ansible-playbooks/tests
+	
+	$
+
+```
+  
+  
+* * *
   
 ### How do I get set up? ###
 
 * Summary of set up
 * Configuration
-s* Dependencies
+* Dependencies
 * Database configuration
 * How to run tests
 * Deployment instructions
