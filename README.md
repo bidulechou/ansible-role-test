@@ -25,7 +25,7 @@ What you need:
   
 ### Clone Rolespec and Ansible Role Test Git Repositories  
 Extract both repositories in the same location, your testing project folder.  
-If you wan to begin from scratch, just clone _rolespec git repository_ as show in the sample below:  
+If you want to begin from scratch (see wiki page: [My First Test Case From Scratch](https://bitbucket.org/beduleconseil/ansible-role-test/wiki/my-first-test-from-scratch)), just clone _rolespec git repository_ as show in the sample below:  
   
 ```shell
 
@@ -58,7 +58,7 @@ If you do not want to begin from scratch you can also clone the _ansible-role-te
   
 ### Configure Environment  
   
-Because on Windows platform, even if you use _Git Bash_, the `make install` command does not work as expected we must enfoce manuel setup as you see next. The bellow code sample will I hope will convince you that normal setup as described in the [Rolespec Documentation](https://github.com/nickjj/rolespec#write-your-first-test-case) _Write Your First Test Case_ section not work on Windows 7 platform:  
+Because on Windows platform, even if you use _Git Bash_, the `make install` command does not work as expected we must enfoce manuel setup as you see next. The bellow code sample will I hope will convince you that normal setup as described in the [Rolespec Documentation](https://github.com/nickjj/rolespec#write-your-first-test-case) _Write Your First Test Case_ section does not work on Windows 7 platform:  
   
 ```shell
 
@@ -86,12 +86,11 @@ Because on Windows platform, even if you use _Git Bash_, the `make install` comm
 	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:25 share/
 	drwxr-xr-x 1 bidule 197121 0 oct.   7 23:25 ssl/
 
-	$ 
-
 ```
-As you can see above, there is no `local` sub-folder in `/usr` folder. But as you can also see the `make install` command has not produced errors. I have also tried to create `/usr/local/bin` and `/usr/local/lib` folders and run again `make install` command without more success. 
+As you can see above, there is no _local_ sub-folder in _/usr_ folder. But as you can also see the _make install_ command has not produced any error in the output. I have also tried to create _/usr/local/bin_ and _/usr/local/lib_ folders and run again `make install` command without more success. Unfortunately _rolespec*_ bin script only works to create your unit tests on Windows platform and minimal shell toolbox as **MinGW64**, it probably works better with **Cygwin**, to be tested... Then in fact rolespec installation process will normally works into a linux system based running docker container. It will be another test to get inside a running container and could be a usefull help when building automation process.
+
   
-Then configuring the environment for running rolespec bin script `rolespec*` on Windows platform needs to be made manually (or by script). You first need to set your path to point to the rolespec's binary sub-folder and some other rolespec's environment variable as shown in the sample bellow:  
+Then configuring the environment for running rolespec bin script `rolespec*` on Windows platform to create your test cases needs to be made manually (or by script). You first need to set your path to point to the rolespec's binary sub-folder and some other rolespec's environment variable as shown in the sample bellow:  
   
 ```shell
 
@@ -104,7 +103,7 @@ Then configuring the environment for running rolespec bin script `rolespec*` on 
   
 But before running the script for the first time you need to fix the `VERSION` file location and if you want to run it on Windows platform you also need to fix the `hostname` command issue, as described in the next section.  
   
-For running tests automation it is also usefull to set the _rolespec runtime_ environment variable as you will see later in the documentation. To set this environment variable proceed as shown in the sample bellow:  
+For running tests automation it is also usefull to set the _ROLESOEC_RUNTIME_ environment variable as you will see later in the documentation. To set this environment variable proceed as shown in the sample bellow:  
 
 ```shell
 
@@ -115,16 +114,16 @@ For running tests automation it is also usefull to set the _rolespec runtime_ en
 	$
 
 ```
-In addition to this environment variable if you want to run your `test` script without automation when writing your role you also need to set the `ROLESPEC_LIB` variable environment (see previous section). The orther environment variables that we also need during the running stage can be set by `setenv` scripts sourced directly by test scripts as you will see in *Building Test* section.
+In addition to this environment variable if you want to run your `test` script without automation when writing your role you also need to set the _ROLESPEC_LIB_ variable environment (see previous section). The orther environment variables that we also need during the running stage can be set by _.setenv_ scripts sourced directly by test scripts as you will see in **Building Test** section.
   
-> We assume using in the rest of the documentation _rolespec environment variables_ when focusing on location of files.
+> We assume using in the rest of the documentation _rolespec environment variables_ when focusing on file's location.
   
   
 ### Fix Rolespec before using it  
   
 * __Mandatory Fix__  
 
-If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *lib/config* file does not search it at the right place. You just have to ceate a link to the file into the *lib* folder as shown in the code sample below:  
+If you want to use, as described in the documentation, the *rolespec* script you need to fix the location of **VERSION** file because the *${ROLESPEC_LIB}/config* file does not search it at the right place. You just have to ceate a link to the file into the *${ROLESPEC_LIB}/lib* folder as shown in the code sample below:  
   
 ```shell
 
@@ -184,7 +183,7 @@ I have'nt tried with `CygWin` because I have not installed it on my Windows work
   
 ### Ansible Repository Structure
   
-As described in [Ansible Best Pratices] (http://docs.ansible.com/ansible/latest/playbooks_best_practices.html#alternative-directory-layout) _Alternative Directory Layout_ section we use simplefied Ansible folder structure layout:  
+As described in [Ansible Best Pratices](http://docs.ansible.com/ansible/latest/playbooks_best_practices.html#alternative-directory-layout) _Alternative Directory Layout_ section we use simplefied Ansible folder structure layout:  
   
 ```
 
@@ -233,23 +232,68 @@ ansible-role-test/
 	tests/
 		roles/
 			role-1/
+				inventory/
+					group_vars/
+					hosts
+				playbook-test.yml
+				test
+			role-2/
+				inventory/
+					hosts
+				playbooks/
+					group_vars/
+						all/
+							common.yml
+					playbook-test.yml
+				test
 			...
 			role-x/
+				...
 
 ```
 The Ansible role unit test folder structure will be discuss in more details in next sections. You can also see wiki page: [My First Test Case From Scratch](https://bitbucket.org/beduleconseil/ansible-role-test/wiki/my-first-test-from-scratch) for further information on how developing tests and role code in _TDD_ approach manner.  
   
-We will focus now on how to execute tests locally in a customized Ansible docker image or remotely if you use a remote docker machine.  
+We will focus now on how to execute tests locally in a customized Ansible docker image or remotely if you use a remote docker machine and in a second time on how we have automated it.  
+  
+  
+## Build The Test & Write The Role  
+  
+Now that we have done previous steps: configure environment and fix issue(s) we can create our test case but prior we nned an empty role as described in sample bellow:
+  
+```shell
+
+	$ mkdir -p /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
+	$ touch /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
+	$ echo -e '---\n' > /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
+	$
+	$ echo ${ROLESPEC_LIB}
+	/<my-path-to/my-testing-projects>/rolespec/lib
+	$
+	$ cd /<my-path-to/my-testing-projects>/ansible-role-test
+	$ rolespec -n tests/roles/install-rancher-cli
+	################# /<my-path-to/my-testing-projects>/rolespec/lib
+	Initialized new test case in /<my-path-to/my-testing-projects>/ansible-role-test/tests/roles/install-rancher-cli
+	
+	$ ll tests/roles/
+	total 4
+	drwxr-xr-x 1 bidule 197121 0 déc.   8 23:13 install-rancher-cli/
+
+```
   
   
 ### Running Tests  
   
+Concerning automation, we have first ran test in standalone without automation but using a running Ansible docker machine   
+  
 We will not explain here how we have customized an Ansible docker image, we assume you have read first the [Docker Ansible Test Roles](https://bitbucket.org/bedule-conseil/docker-ansible-test-roles/src) project `README.md` file if you need to understand more deeply how we have done it.
   
+We will use here as runnable role test examples those that have first taken place in this repository `install-rancher-cli` and `0_test-ping` which have been produced in a second time helping to develop automation test script `TestSuite.sh`, this part will be explain in one of next sections.
   
-You can see in the output sample bellow the tests ran in an automated manner against a customized Ansible docker image:  
+In this section we first explain test and role task, this is a simple test which test a simple role. As said earlier the most simplier role task is, the most easiest 
   
-```bash
+You can see in the output sample bellow successfully passed tests that ran in an automated manner against a customized Ansible docker image:  
+  
+```
 
 	$ docker run -i --name test-ansible b25202b723ed
 	Cloning into 'rolespec'...
@@ -354,6 +398,74 @@ You can see in the output sample bellow the tests ran in an automated manner aga
 
 ```
   
+Unfortunately 
+  
+And here is a failed test result sample:
+
+```
+
+	TEST: [Run playbook syntax check]
+
+	playbook: playbooks/test.yml
+
+	TEST: [Run playbook]
+
+	PLAY [localhost] ***************************************************************
+
+	TASK [Gathering Facts] *********************************************************
+	ok: [localhost]
+
+	TASK [install-rancher-cli : stat] **********************************************
+	ok: [localhost]
+
+	TASK [install-rancher-cli : debug] *********************************************
+	ok: [localhost] => {
+		"file_presence.stat.exists": false
+	}
+
+	TASK [install-rancher-cli : Download file if needed] ***************************
+	changed: [localhost]
+
+	TASK [install-rancher-cli : Unarchive zipped tar ball file] ********************
+	changed: [localhost]
+
+	TASK [install-rancher-cli : Create link into /usr/local/bin] *******************
+	changed: [localhost]
+
+	PLAY RECAP *********************************************************************
+	localhost                  : ok=6    changed=3    unreachable=0    failed=0
+
+
+	TEST: [Re-run playbook]
+
+	TEST: [In output | PASS]
+	found:
+	changed=0.*unreachable=0.*failed=0
+
+	in output:
+	localhost                  : ok=5    changed=0    unreachable=0    failed=0
+
+
+	TEST: [File '/opt/rancher-v0.6.5' exists | PASS]
+
+
+	TEST: [In output | PASS]
+	found:
+	755
+
+	in output:
+	755 ?
+
+
+	TEST: [File '/usr/local/bin/rancher' exists | PASS]
+
+
+	TEST: [File '/usr/local/lib/rancher-v0.6.5' does not exists | FAIL]
+
+	/workspace/ansible-playbooks/tests
+
+
+```
   
 * * *
   
