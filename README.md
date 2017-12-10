@@ -249,7 +249,7 @@ We will not explain here how we have customized an Ansible docker image, we assu
   
 You can see in the output sample bellow the tests ran in an automated manner against a customized Ansible docker image:  
   
-```ansible
+```bash
 
 	$ docker run -i --name test-ansible b25202b723ed
 	Cloning into 'rolespec'...
