@@ -15,7 +15,7 @@
 #       && echo "ansible  ALL=(ALL)   NOPASSWD:ALL" > /etc/sudoers.d/ansible \
 #       && useradd -d /home/ansible -m -s /bin/bash ansible
 if [ ! -f "roles" ]; then
-	ln -s roles ${ROLES_HOME}
+	ln -s ${ROLES_HOME} ./roles 
 
 	##for debug only...
 	if [[ -n "${DEBUG}" ]]; then
