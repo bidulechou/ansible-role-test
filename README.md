@@ -263,8 +263,8 @@ Now that we have done previous steps: configure environment and fix issue(s) we 
 ```shell
 
 	$ mkdir -p /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
-	$ touch /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
-	$ echo -e '---\n' > /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
+	$ touch /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks/main.yml
+	$ echo -e '---\n' > /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks/main.yml
 	$
 	$ echo ${ROLESPEC_LIB}
 	/<my-path-to/my-testing-projects>/rolespec/lib
@@ -277,8 +277,104 @@ Now that we have done previous steps: configure environment and fix issue(s) we 
 	$ ll tests/roles/
 	total 4
 	drwxr-xr-x 1 bidule 197121 0 déc.   8 23:13 install-rancher-cli/
+	
 
 ```
+Now in our new created unit test folder contains the `test` script and a folder tree named `inventory` which itself contains the host's inventory file `hosts` and an empty sub-folder named `group_vars`.  
+  
+We need first specify what will do our role and then write tests that verify the role execution and finaly write the role to do what it does.  
+  
+The goal of our role `install-rabcher-cli` is to download the rancher client tarball artefact if not already done and unarchive artefact in a specific location and finaly create a link to the rancher binary into a  `bin` folder already referenced by the normal path.  
+  
+Initial test file content is listed bellow:  
+  
+```bash
+
+	$ cat tests/roles/install-rancher-cli/test
+	# The file must be declared as /bin/bash
+	#!/bin/bash
+
+
+	# This gives you access to the custom DSL
+	. "${ROLESPEC_LIB}/main"
+
+
+	# Everything past this point is the custom DSL which is optional
+
+	# Install a specific version of Ansible, you can
+	# omit the version to install devel (latest unstable)
+	install_ansible "v1.7.1"
+
+
+	# An assertion which does the following:
+	#   - Syntax check on the playbook
+	#   - Run the playbook
+	assert_playbook_runs
+
+	# An assertion that re-runs the playbook checking for no changes
+	assert_playbook_idempotent
+
+	# This is where you would add more assert statements for a "real" role
+	# Check https://github.com/nickjj/rolespec/README.rst#the-test-api for details
+	#
+	# You are also not limited to the test API, you can write any scripts you want
+
+```
+  
+What will do our role, it will download tarball artefact from the internet if not yet downloaded and then unarchive the artefact in a specific location with upload on remote machine and finaly create a link to rancher binary file.  
+  
+What will verify our test to valdate that our role has done its task successfully, we can check presence of the rancher folder and also check allowed permissions and finaly check the presence of the link, as shown in the code sample bellow:  
+  
+```bash
+
+	#!/bin/bash
+
+	# initialise rolespec
+	. "${ROLESPEC_LIB}/main"
+
+	# install specific version of ansible
+	#install_ansible "v2.4.0"
+
+
+	####################################
+	## Setup section                   #
+	####################################
+	## place to prepare test environment and/or install and configure daemons, services, tools, users, groups...
+	# i.e.: apt-get install apache2  ## will install and run apache2 as a service
+
+
+	####################################
+	## Run Test section                #
+	####################################
+
+	# check syntax first, and then that the playbook runs
+	assert_playbook_runs
+
+
+	# check that the playbook is idempotent
+	assert_playbook_idempotent
+
+
+	####################################
+	## Check Result section            #
+	####################################
+	## place to verify the result(s) of the test(s)
+	# i.e.: assert_path /home/ansible/workspace
+	assert_path /opt/rancher-v0.6.5
+	assert_permission /opt/rancher-v0.6.5/rancher 755
+	assert_path /usr/local/bin/rancher
+
+
+	####################################
+	## Teardonw section                #
+	####################################
+	## place to cleanup previous installation or service shutdown or what else
+	# i.e.: service apache2 stop  ## if not stopped can cause issue when using vagrant to stop VM
+
+
+```
+  
+As you can see we have added 3 assertions in the _Check Result_ section and this 3 simple assertions are enough to verify if the role has done its work.
   
   
 ### Running Tests  
