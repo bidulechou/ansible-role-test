@@ -263,8 +263,8 @@ Now that we have done previous steps: configure environment and fix issue(s) we 
 ```shell
 
 	$ mkdir -p /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
-	$ touch /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
-	$ echo -e '---\n' > /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks
+	$ touch /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks/main.yml
+	$ echo -e '---\n' > /<my-path-to/my-testing-projects>/ansible-role-test/roles/install-rancher-cli/tasks/main.yml
 	$
 	$ echo ${ROLESPEC_LIB}
 	/<my-path-to/my-testing-projects>/rolespec/lib
@@ -277,6 +277,7 @@ Now that we have done previous steps: configure environment and fix issue(s) we 
 	$ ll tests/roles/
 	total 4
 	drwxr-xr-x 1 bidule 197121 0 déc.   8 23:13 install-rancher-cli/
+	
 
 ```
 Now in our new created unit test folder contains the `test` script and a folder tree named `inventory` which itself contains the host's inventory file `hosts` and an empty sub-folder named `group_vars`.  
@@ -320,10 +321,11 @@ Initial test file content is listed bellow:
 
 ```
   
-What will do our role, it will download tarball artefact from the internet if it not yet downloaded and then unarchive it in a specific location with upload on remote machine if needed and finaly create a link to rancher binary file.  
-What will verify our test to valdate the role has done its task successfully, we can check presence of the rancher folder and also check allowed permissions and finaly check the presence of the link, as shon in the code sample bellow:  
+What will do our role, it will download tarball artefact from the internet if not yet downloaded and then unarchive the artefact in a specific location with upload on remote machine and finaly create a link to rancher binary file.  
   
-```
+What will verify our test to valdate that our role has done its task successfully, we can check presence of the rancher folder and also check allowed permissions and finaly check the presence of the link, as shown in the code sample bellow:  
+  
+```bash
 
 	#!/bin/bash
 
@@ -372,7 +374,7 @@ What will verify our test to valdate the role has done its task successfully, we
 
 ```
   
-As you can see we have add 3 assertions in the _Check Result_ section and this 3 simple assertions are enough to verify if the role has done its work.
+As you can see we have added 3 assertions in the _Check Result_ section and this 3 simple assertions are enough to verify if the role has done its work.
   
   
 ### Running Tests  
