@@ -1,0 +1,66 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+
+	dependencies {
+		classpath 'com.bmuschko:gradle-docker-plugin:3.0.11'
+		classpath 'com.palominolabs.gradle.task:gradle-git-clone-task:0.0.3'
+	}
+}
+
+// use fully qualified class name
+apply plugin: com.bmuschko.gradle.docker.DockerRemoteApiPlugin
+
+// import task classes
+import com.bmuschko.gradle.docker.tasks.container.*
+import com.palominolabs.gradle.task.git.clone.*
+
+def workDir = ''
+if (project.hasProperty('working_dir')) {
+  workDir = project.property('working_dir')
+} else {
+  workDir = '/workspace'
+}
+
+task cloneRolespec(type: GitCloneTask){
+  dir = file("${workDir}/rolespec")
+  uri = 'https://github.com/nickjj/rolespec.git'
+  treeish = "v0.3.2"
+}
+
+task createDockerContainer(type: DockerCreateContainer){
+	imageId = 'williamyeh/ansible:ubuntu16.04'
+	containerName = 'ansible-test-image'
+	attachStderr = true
+	attachStdout = true
+	binds = [ "${workDir}":"/workspace" ]
+	workingDir = '/workspace'
+	env = [ "ROLESPEC_LIB=/workspace/rolespec/lib",
+			"ROLESPEC_RUNTIME=/workspace/ansible-role-test",
+			"ANSIBLE_FORCE_COLOR=true",
+			"DEBUG=true"
+	]
+	publishAll = true
+}
+
+task startDockerContainer(dependsOn: createDockerContainer, type: DockerStartContainer){
+	targetContainerId { createDockerContainer.getContainerId() }
+}
+
+task execDockerContainer(dependsOn: startDockerContainer, type: DockerExecContainer){
+	targetContainerId { createDockerContainer.getContainerId() }
+	attachStderr = true
+	attachStdout = true
+	cmd = [ "/workspace/ansible-role-test/tests/TestSuite.sh" ]
+}
+
+task stopDockerContainer(dependsOn: startDockerContainer, type: DockerStopContainer){
+	targetContainerId { createDockerContainer.getContainerId() }
+}
+
+task removeDockerContainer(dependsOn: stopDockerContainer, type: DockerRemoveContainer){
+	targetContainerId { createDockerContainer.getContainerId() }
+	removeVolumes = true
+	force = true
+}
