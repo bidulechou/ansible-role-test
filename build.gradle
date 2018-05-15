@@ -1,0 +1,81 @@
+buildscript {
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:3.3.0'
+        classpath 'com.netflix.nebula:gradle-override-plugin:3.0.2'
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.11'
+        classpath 'com.palominolabs.gradle.task:gradle-git-clone-task:0.0.3'
+        classpath 'org.eclipse.jgit:org.eclipse.jgit:4.9.2.201712150930-r'
+        classpath 'com.netflix.nebula:gradle-override-plugin:3.0.2'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.bmuschko.docker-java-application'
+apply plugin: 'nebula.override'
+
+
+import com.palominolabs.gradle.task.git.clone.*
+import com.bmuschko.gradle.docker.tasks.container.*
+
+
+def workDir = project.hasProperty('working_dir') ? project.property('working_dir') : '/workSpace'
+def debugLevel = project.hasProperty('debug_level') ? project.property('debug_level') : 'DEBUG='
+
+task cloneRolespec(type: GitCloneTask) {
+    strictHostKeyChecking = false
+    dir = file("${workDir}/rolespec")
+    uri = 'https://https://github.com/nickjj/rolespec'
+    treeish = 'origin/master'
+}
+
+task createDockerContainer(type: DockerCreateContainer) {
+    imageId = 'docker-ansible-image:0.1'
+    containerName = 'ansible-test-image'
+    publishAll = true
+    attachStdout = true
+    attachStderr = true
+    binds = [ "${workDir}":"/workspace" ]
+    env = [ "ROLESPEC_HOME=/workspace/rolespec",
+            "ROLESPEC_RUNTIME=/workspace/community-ansible-playbook/rancher",
+            "ANSIBLE_FORCE_COLOR=true",
+            "${debugLevel}"
+    ]
+}
+
+task startDockerContainer(dependsOn: createDockerContainer, type: DockerStartContainer) {
+    targetContainerId { createDockerContainer.getContainerId() }
+}
+
+task execDockerContainer(dependsOn: startDockerContainer, type: DockerExecContainer) {
+    targetContainerId { createDockerContainer.getContainerId() }
+    cmd = [ "/workspace/community-ansible-playbook/rancher/tests/TestSuite.sh" ]
+    ext.output = { return standardOuput.toString() }
+    println cmd.toString()
+}
+
+task checkTestExecStatus(dependsOn: execDockerContainer) {
+    doLast() {
+        try {
+            File resultFile = file('rancher/tests/report_result.txt')
+            if (resultFile.getText().contains('KO')) {
+                throw new TaskExecutionException(task, new Exception('Exec tests task failed'))
+            }
+        } catch(FileNotFoundException fnfe) {
+            assert fnfe in FileNotFoundException
+        }
+    }
+}
+
+task stopDockerContainer(dependsOn: startDockerContainer, type: DockerStopContainer) {
+    targetContainerId { createDockerContainer.getContainerId() }
+    timeout = 3600
+}
+
+task removeDockerContainer(dependsOn: stopDockerContainer, type: DockerRemoveContainer) {
+    targetContainerId { createDockerContainer.getContainerId() }
+    removeVolumes = false
+    force = true
+}
+
+checkTestExecStatus.finalizedBy removeDockerContainer
